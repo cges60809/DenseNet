@@ -3,12 +3,24 @@ import argparse
 from models.dense_net import DenseNet
 from data_providers.utils import get_data_provider_by_name
 
+train_params_MNIST = {
+    'batch_size': 64,
+    'n_epochs': 500,
+    'initial_learning_rate': 0.1,
+    'reduce_lr_epoch_1': 250,  # epochs * 0.5
+    'reduce_lr_epoch_2': 375,  # epochs * 0.75
+    'validation_set': True,
+    'validation_split': None,  # None or float
+    'shuffle': 'every_epoch',  # None, once_prior_train, every_epoch
+    'normalization': 'None',  # None, divide_256, divide_255, by_chanels
+}
+
 train_params_cifar = {
     'batch_size': 64,
-    'n_epochs': 300,
+    'n_epochs': 500,
     'initial_learning_rate': 0.1,
-    'reduce_lr_epoch_1': 150,  # epochs * 0.5
-    'reduce_lr_epoch_2': 225,  # epochs * 0.75
+    'reduce_lr_epoch_1': 250,  # epochs * 0.5
+    'reduce_lr_epoch_2': 375,  # epochs * 0.75
     'validation_set': True,
     'validation_split': None,  # None or float
     'shuffle': 'every_epoch',  # None, once_prior_train, every_epoch
@@ -33,6 +45,8 @@ def get_train_params_by_name(name):
         return train_params_cifar
     if name == 'SVHN':
         return train_params_svhn
+    if name in 'MNIST':
+        return train_params_MNIST
 
 
 if __name__ == '__main__':
@@ -47,7 +61,7 @@ if __name__ == '__main__':
              'performed right after training.')
     parser.add_argument(
         '--model_type', '-m', type=str, choices=['DenseNet', 'DenseNet-BC'],
-        default='DenseNet',
+        default='DenseNet-BC',
         help='What type of model to use')
     parser.add_argument(
         '--growth_rate', '-k', type=int, choices=[12, 24, 40],
@@ -56,12 +70,12 @@ if __name__ == '__main__':
              'choices were restricted to used in paper')
     parser.add_argument(
         '--depth', '-d', type=int, choices=[40, 100, 190, 250],
-        default=40,
+        default=100,
         help='Depth of whole network, restricted to paper choices')
     parser.add_argument(
         '--dataset', '-ds', type=str,
-        choices=['C10', 'C10+', 'C100', 'C100+', 'SVHN'],
-        default='C10',
+        choices=['C10', 'C10+', 'C100', 'C100+', 'SVHN', 'MNIST'],
+        default='MNIST',
         help='What dataset should be used')
     parser.add_argument(
         '--total_blocks', '-tb', type=int, default=3, metavar='',
@@ -115,7 +129,7 @@ if __name__ == '__main__':
     args = parser.parse_args()
 
     if not args.keep_prob:
-        if args.dataset in ['C10', 'C100', 'SVHN']:
+        if args.dataset in ['C10', 'C100', 'SVHN', 'MNIST']:
             args.keep_prob = 0.8
         else:
             args.keep_prob = 1.0

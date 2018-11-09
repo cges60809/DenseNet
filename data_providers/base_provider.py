@@ -64,6 +64,8 @@ class ImagesDataSet(DataSet):
             for i in range(images.shape[-1]):
                 images[:, :, :, i] = ((images[:, :, :, i] - self.images_means[i]) /
                                        self.images_stds[i])
+        elif normalization_type == 'None':
+            images = images
         else:
             raise Exception("Unknown type of normalization")
         return images

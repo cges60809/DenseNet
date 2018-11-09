@@ -351,3 +351,5 @@ if __name__ == '__main__':
         'Shuffled dataset',
         cifar_100_idx_to_class)
     plt.show()
+
+
